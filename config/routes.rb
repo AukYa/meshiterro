@@ -5,7 +5,13 @@ Rails.application.routes.draw do
     resource :favorite
   end
   
-  devise_for :users
+  devise_for :admin, skip: [:registrations, :password], controllers: {
+    sessions: 'admin/sessions'
+  }
+  
+  devise_for :users, controllers: {
+        sessions: 'users/sessions'
+  }
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   get '/' => 'homes#top'
   root to: "homes#top"
