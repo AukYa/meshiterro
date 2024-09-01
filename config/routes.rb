@@ -1,20 +1,28 @@
 Rails.application.routes.draw do
-  resources :users
-  resources :post_images do
-    resources :post_comments
-    resource :favorite
+  scope module: :public do
+    devise_for :users
+    get '/' => 'homes#top'
+    root to: "homes#top"
+    get 'homes/about', to: 'homes#about', as: 'about'
+    resources :post_images, only: [:new, :create, :index, :show, :destroy] do
+      resource :favorite, only: [:create, :destroy]
+      resources :post_comments, only: [:create, :destroy]
+    end
+    resources :users, only: [:show,:edit, :update]
   end
-  
+
   devise_for :admin, skip: [:registrations, :password], controllers: {
     sessions: 'admin/sessions'
   }
   
-  devise_for :users, controllers: {
-        sessions: 'users/sessions'
-  }
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
-  get '/' => 'homes#top'
-  root to: "homes#top"
-  get 'homes/about', to: 'homes#about', as: 'about'
+  namespace :admin do
+    get 'dashboards', to: 'dashboards#index'
+    resources :users, only: [:destroy]
+  end
+  
 
+  devise_scope :admin do
+    get 'dashboards', to: 'dashboards#index'
+  end
+  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 end
